@@ -7,17 +7,45 @@
 #include <errno.h>
 #include <string.h>
 
-int main(void) {
+int main(int argc, char* argv[]) {
 	fd_set rfds;
 	struct timeval tv;
 	struct tundev_t tun;
 	int res;
+	int flags = 0;
+
+	/* Skip program name */
+	argc--;
+	argv++;
+
+	/* Process command-line arguments */
+	while (argc) {
+		if (!strcmp("-tun", argv[0])) {
+			flags |= IFF_TUN;
+		} else if (!strcmp("-tap", argv[0])) {
+			flags |= IFF_TAP;
+		}
+		argc--;
+		argv++;
+	}
+
+	/* Handle silly combinations */
+	switch (flags & (IFF_TAP|IFF_TUN)) {
+	case IFF_TAP|IFF_TUN:
+		fprintf(stderr, "Is this a tap or tun device?\n");
+		return 1;
+	case 0:
+		/* Assume tun */
+		fprintf(stderr, "Assuming tun device\n");
+		flags |= IFF_TUN;
+		break;
+	}
 
 	/* Open a tunnel device */
 	memset(&tun, 0, sizeof(tun));
-	res = tun_open(&tun);
+	res = tun_open(&tun, flags);
 	if (res < 0) {
-		fprintf(stderr, "Failed to open tunnel: %s\n",
+		fprintf(stderr, "Failed to open device: %s\n",
 				strerror(-res));
 		return 1;
 	}

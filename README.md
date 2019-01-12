@@ -74,3 +74,11 @@ This might be done by copying data to a `struct iphdr` (`linux/ip.h`) if it's
 an IPv4 payload or `struct ipv6hdr` (`linux/ipv6.h`) if it's IPv6.
 Alternatively you might choose to implement the dissector using your own data
 structures rather than using the Linux kernel ones.
+
+## `tap` differences
+
+For `tap` devices, the format is the same.  You get the same packet
+information header, and it'll even duplicate the "ethertype" field.  However
+instead of an IP datagram, you'll get a raw Ethernet frame.  Thus, you'll need
+to manage sending ARP requests (IPv4) or neighbour solicitation messages
+(IPv6), and manage a MAC address table.

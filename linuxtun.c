@@ -15,13 +15,13 @@
 
 #include "linuxtun.h"
 
-static int tun_alloc(char* const dev);
+static int tun_alloc(char* const dev, int flags);
 
-int tun_open(struct tundev_t* const dev) {
+int tun_open(struct tundev_t* const dev, int flags) {
 	if (dev->fd > 0)
 		return -EALREADY;
 
-	dev->fd = tun_alloc(dev->name);
+	dev->fd = tun_alloc(dev->name, flags);
 	if (dev->fd < 0)
 		return -errno;
 
@@ -69,7 +69,7 @@ int tun_read(const struct tundev_t* const dev, struct tundev_frame_t*
 }
 
 /* Credit: Documentation/networking/tuntap.txt in the Linux kernel sources */
-static int tun_alloc(char* const dev) {
+static int tun_alloc(char* const dev, int flags) {
 	struct ifreq ifr;
 	int fd, err;
 
@@ -83,8 +83,8 @@ static int tun_alloc(char* const dev) {
 	 *        IFF_TAP   - TAP device  
 	 *
 	 *        IFF_NO_PI - Do not provide packet information  
-	 */ 
-	ifr.ifr_flags = IFF_TUN; 
+	 */
+	ifr.ifr_flags = flags;
 	if (*dev)
 		strncpy(ifr.ifr_name, dev, IFNAMSIZ);
 

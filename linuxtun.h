@@ -22,7 +22,7 @@ struct tundev_frame_t {
 	uint8_t		data[];
 };
 
-int tun_open(struct tundev_t* const dev);
+int tun_open(struct tundev_t* const dev, int flags);
 int tun_read(const struct tundev_t* const dev, struct tundev_frame_t*
 		const frame, size_t max_sz);
 int tun_close(struct tundev_t* const dev);
