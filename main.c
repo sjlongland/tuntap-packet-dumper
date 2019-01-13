@@ -68,7 +68,11 @@ int main(int argc, char* argv[]) {
 				uint8_t raw[1508];
 				struct tundev_frame_t data;
 			} frame;
-			const uint8_t* ptr = frame.data.data;
+			const struct ethhdr* ethhdr =
+				(struct ethhdr*)frame.data.data;
+			const uint8_t* ptr = &frame.data.data[
+					sizeof(struct ethhdr)
+			];
 			int off = 0;
 			int len = tun_read(&tun, &frame.data, sizeof(frame));
 			if (len < 0) {
@@ -78,9 +82,24 @@ int main(int argc, char* argv[]) {
 			}
 
 			/* Dump the frame data out to stdout */
-			printf("Flags: 0x%04x  Protocol: 0x%04x\n",
+			printf("Flags: 0x%04x  Protocol: 0x%04x\n"
+			       "To:    %02x:%02x:%02x:%02x:%02x:%02x\n"
+			       "From:  %02x:%02x:%02x:%02x:%02x:%02x\n",
 					frame.data.info.flags,
-					frame.data.info.proto);
+					frame.data.info.proto,
+					ethhdr->h_dest[0],
+					ethhdr->h_dest[1],
+					ethhdr->h_dest[2],
+					ethhdr->h_dest[3],
+					ethhdr->h_dest[4],
+					ethhdr->h_dest[5],
+					ethhdr->h_source[0],
+					ethhdr->h_source[1],
+					ethhdr->h_source[2],
+					ethhdr->h_source[3],
+					ethhdr->h_source[4],
+					ethhdr->h_source[5]
+			      );
 			printf("%4d:  0  1  2  3  4  5  6  7"
 				   "  8  9 10 11 12 13 14 15", len);
 			while (len) {
