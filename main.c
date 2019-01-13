@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 int main(int argc, char* argv[]) {
 	fd_set rfds;
@@ -100,6 +101,52 @@ int main(int argc, char* argv[]) {
 					ethhdr->h_source[4],
 					ethhdr->h_source[5]
 			      );
+			if (frame.data.info.proto == ETH_P_IPV6) {
+				char addr[INET6_ADDRSTRLEN+1];
+				/*
+				 * We can't use linux/ipv6.h because it
+				 * clashes with arpa/inet.h!
+				 */
+				uint16_t payload_len;
+				struct in6_addr raw_addr;
+
+				memcpy(&payload_len,
+						&ptr[4],
+						sizeof(payload_len));
+				payload_len = htons(payload_len);
+
+				printf("IP Version %u  Priority: %u\n"
+						"Flow Label:  0x%02x%02x%02x\n"
+						"Payload length: %u\n"
+						"Next header: 0x%02x\n"
+						"Hop limit:   %u\n",
+						ptr[0] >> 4,
+						ptr[0] & 0x0f,
+						ptr[1],
+						ptr[2],
+						ptr[3],
+						payload_len,
+						ptr[6],
+						ptr[7]);
+
+				memset(addr, 0, sizeof(addr));
+				memcpy(&raw_addr, &ptr[8],
+						sizeof(raw_addr));
+				printf("Source IP: %s\n",
+						inet_ntop(AF_INET6,
+							&raw_addr,
+							addr,
+							sizeof(addr)));
+
+				memset(addr, 0, sizeof(addr));
+				memcpy(&raw_addr, &ptr[24],
+						sizeof(raw_addr));
+				printf("Dest IP:   %s\n",
+						inet_ntop(AF_INET6,
+							&raw_addr,
+							addr,
+							sizeof(addr)));
+			}
 			printf("%4d:  0  1  2  3  4  5  6  7"
 				   "  8  9 10 11 12 13 14 15", len);
 			while (len) {
@@ -111,7 +158,7 @@ int main(int argc, char* argv[]) {
 				off++;
 				len--;
 			}
-			printf("\n");
+			printf("\n\n");
 		}
 	}
 
