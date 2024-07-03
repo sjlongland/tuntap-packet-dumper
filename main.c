@@ -76,6 +76,8 @@ int main(int argc, char* argv[]) {
 			const uint8_t* ptr = &frame.data.data[
 					sizeof(struct ethhdr)
 			];
+			const uint16_t h_proto = htons(ethhdr->h_proto);
+
 			int off = 0;
 			int len = tun_read(&tun, &frame.data, sizeof(frame));
 			if (len < 0) {
@@ -85,11 +87,13 @@ int main(int argc, char* argv[]) {
 			}
 
 			/* Dump the frame data out to stdout */
-			printf("Flags: 0x%04x  Protocol: 0x%04x\n"
+			printf("PI Flags: 0x%04x  PI Protocol: 0x%04x\n"
+			       "Proto: 0x%04x\n"
 			       "To:    %02x:%02x:%02x:%02x:%02x:%02x\n"
 			       "From:  %02x:%02x:%02x:%02x:%02x:%02x\n",
 					frame.data.info.flags,
 					frame.data.info.proto,
+					h_proto,
 					ethhdr->h_dest[0],
 					ethhdr->h_dest[1],
 					ethhdr->h_dest[2],
