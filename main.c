@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 		} else if (res > 0) {
 			/* We have a packet */
 			union {
-				uint8_t raw[1508];
+				uint8_t raw[1522];
 				struct tundev_frame_t data;
 			} frame;
 			const struct ethhdr* ethhdr =
