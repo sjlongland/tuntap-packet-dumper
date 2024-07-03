@@ -25,6 +25,8 @@ int tun_open(struct tundev_t* const dev, int flags) {
 	if (dev->fd < 0)
 		return -errno;
 
+	dev->flags = flags;
+
 	return 0;
 }
 
@@ -53,13 +55,19 @@ int tun_read(const struct tundev_t* const dev, struct tundev_frame_t*
 			return -EPIPE;
 	}
 
-	/* First four bytes are the packet information */
-	memcpy(&(frame->info), ptr, sizeof(frame->info));
-	ptr += sizeof(frame->info);
-	len -= sizeof(frame->info);
+	/* If IFF_NO_PI is set, this header is omitted */
+	if (!(dev->flags & IFF_NO_PI)) {
+		/* First four bytes are the packet information */
+		memcpy(&(frame->info), ptr, sizeof(frame->info));
+		ptr += sizeof(frame->info);
+		len -= sizeof(frame->info);
 
-	/* Protocol is in big-endian format */
-	frame->info.proto = ntohs(frame->info.proto);
+		/* Protocol is in big-endian format */
+		frame->info.proto = ntohs(frame->info.proto);
+	} else {
+		frame->info.flags = 0;
+		frame->info.proto = 0;
+	}
 
 	/* Rest is the packet data */
 	memcpy(frame->data, ptr, len);

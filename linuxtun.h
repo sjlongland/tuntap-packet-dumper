@@ -11,6 +11,8 @@ struct tundev_t {
 	char	name[IFNAMSIZ];
 	/*! Tunnel file descriptor */
 	int	fd;
+	/*! Tunnel flags */
+	int	flags;
 };
 
 struct tundev_frame_t {
