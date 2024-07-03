@@ -87,12 +87,15 @@ int main(int argc, char* argv[]) {
 			}
 
 			/* Dump the frame data out to stdout */
-			printf("PI Flags: 0x%04x  PI Protocol: 0x%04x\n"
-			       "Proto: 0x%04x\n"
+			if (!(tun.flags & IFF_NO_PI)) {
+				printf("Flags: 0x%04x  Proto: 0x%04x\n",
+					frame.data.info.flags,
+					frame.data.info.proto
+				);
+			}
+			printf("EType: 0x%04x\n"
 			       "To:    %02x:%02x:%02x:%02x:%02x:%02x\n"
 			       "From:  %02x:%02x:%02x:%02x:%02x:%02x\n",
-					frame.data.info.flags,
-					frame.data.info.proto,
 					h_proto,
 					ethhdr->h_dest[0],
 					ethhdr->h_dest[1],
@@ -106,7 +109,8 @@ int main(int argc, char* argv[]) {
 					ethhdr->h_source[3],
 					ethhdr->h_source[4],
 					ethhdr->h_source[5]
-			      );
+			);
+
 			if (frame.data.info.proto == ETH_P_IPV6) {
 				char addr[INET6_ADDRSTRLEN+1];
 				/*
