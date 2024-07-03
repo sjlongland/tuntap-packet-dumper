@@ -151,7 +151,61 @@ int main(int argc, char* argv[]) {
 				dptr += sizeof(d_proto);
 			}
 
-			if (d_proto == ETH_P_IPV6) {
+			if (d_proto == ETH_P_IP) {
+				struct in_addr raw_addr;
+				uint16_t payload_len;
+				uint16_t header_len;
+				uint16_t flags_fragoff;
+				char addr[INET_ADDRSTRLEN+1];
+
+				/* This is actually the total length */
+				memcpy(&payload_len,
+						&dptr[2],
+						sizeof(payload_len));
+				payload_len = htons(payload_len);
+
+				/* Header length is in 32-bit words */
+				header_len = dptr[1] & 0x0f;
+				header_len *= 4;
+
+				/* Payload length is thus the remainder */
+				payload_len -= header_len;
+
+
+				printf( "IP Version %u  DSCP: %u  ECN: %u\n"
+					"Payload length: %u  "
+					"Ident: 0x%02x%02x\n"
+					"Flags: 0x%02x  Frag Off: %u\n"
+					"TTL:   %3u     Proto: %3u\n"
+					"CSum: 0x%02x%02x\n",
+					dptr[0] >> 4,
+					dptr[1] >> 2,
+					dptr[1] & 0x03,
+					payload_len,
+					dptr[4], dptr[5],
+					dptr[6] >> 5,
+					((dptr[6] & 0x1f) << 8) | dptr[7],
+					dptr[8], dptr[9], dptr[10], dptr[11]
+				);
+
+				memset(addr, 0, sizeof(addr));
+				memcpy(&raw_addr, &dptr[12],
+						sizeof(raw_addr));
+				printf("Source IP: %s\n",
+						inet_ntop(AF_INET,
+							&raw_addr,
+							addr,
+							sizeof(addr)));
+
+				memset(addr, 0, sizeof(addr));
+				memcpy(&raw_addr, &dptr[16],
+						sizeof(raw_addr));
+				printf("Dest IP:   %s\n",
+						inet_ntop(AF_INET,
+							&raw_addr,
+							addr,
+							sizeof(addr)));
+			} else if (d_proto == ETH_P_IPV6) {
 				char addr[INET6_ADDRSTRLEN+1];
 				/*
 				 * We can't use linux/ipv6.h because it
