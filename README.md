@@ -82,3 +82,41 @@ information header, and it'll even duplicate the "ethertype" field.  However
 instead of an IP datagram, you'll get a raw Ethernet frame.  Thus, you'll need
 to manage sending ARP requests (IPv4) or neighbour solicitation messages
 (IPv6), and manage a MAC address table.
+
+# Example output
+
+## With `-no-pi`
+
+### Raw IPv6 datagram
+
+```
+EType: 0x86dd
+To:    33:33:00:00:00:01
+From:  ce:32:0b:4c:93:48
+ 118:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+   0: 60 0c 19 bf 00 40 3a 01 fe 80 00 00 00 00 00 00
+  16: cc 32 0b ff fe 4c 93 48 ff 02 00 00 00 00 00 00
+  32: 00 00 00 00 00 00 00 01 80 00 ef 4a c1 a7 00 02
+  48: 9b 03 85 66 00 00 00 00 85 07 03 00 00 00 00 00
+  64: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f
+  80: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
+  96: 30 31 32 33 34 35 36 37 34 35 36 37 6b 69 73 68
+ 112: 69 c0 23 00 1c 80
+```
+
+### 802.1q carrying IPv6 traffic
+
+```
+EType: 0x8100
+To:    33:33:00:00:00:01
+From:  ce:32:0b:4c:93:48
+ 122:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+   0: 40 7b 86 dd 60 0c 19 bf 00 40 3a 01 fe 80 00 00
+  16: 00 00 00 00 cc 32 0b ff fe 4c 93 48 ff 02 00 00
+  32: 00 00 00 00 00 00 00 00 00 00 00 01 80 00 a3 f1
+  48: c1 a1 00 02 8b 03 85 66 00 00 00 00 e2 66 01 00
+  64: 00 00 00 00 10 11 12 13 14 15 16 17 18 19 1a 1b
+  80: 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b
+  96: 2c 2d 2e 2f 30 31 32 33 34 35 36 37 6b 69 73 68
+ 112: 69 c0 23 00 1c 80 01 00 00 00
+```
