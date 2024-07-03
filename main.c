@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
 			flags |= IFF_TUN;
 		} else if (!strcmp("-tap", argv[0])) {
 			flags |= IFF_TAP;
+		} else if (!strcmp("-no-pi", argv[0])) {
+			flags |= IFF_NO_PI;
 		}
 		argc--;
 		argv++;
