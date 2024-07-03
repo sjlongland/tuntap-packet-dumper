@@ -129,6 +129,13 @@ Flags: 0x0000  Proto: 0x0806
 EType: 0x0806
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+ARP HType: 1, PType: 2048
+HLen: 6, PLen: 4
+Operation: 0x0001
+Sender HW Addr: ce:32:0b:4c:93:48
+Sender Proto Addr: 172.24.0.1
+Target HW Addr: 00:00:00:00:00:00
+Target Proto Addr: 172.24.0.2
   42:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 00 01 08 00 06 04 00 01 ce 32 0b 4c 93 48 ac 18
   16: 00 01 00 00 00 00 00 00 ac 18 00 02 00 00 00 00
@@ -192,10 +199,18 @@ Flags: 0x0000  Proto: 0x0806
 EType: 0x8100
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+802.1Q VLAN 123: Priority: 2 DEI: N Datagram protocol: 0x0806
+ARP HType: 1, PType: 2048
+HLen: 6, PLen: 4
+Operation: 0x0001
+Sender HW Addr: ce:32:0b:4c:93:48
+Sender Proto Addr: 172.25.0.1
+Target HW Addr: 00:00:00:00:00:00
+Target Proto Addr: 172.25.0.2
   46:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 40 7b 08 06 00 01 08 00 06 04 00 01 ce 32 0b 4c
   16: 93 48 ac 19 00 01 00 00 00 00 00 00 ac 19 00 02
-  32: d3 25 85 66 00 00 00 00 61 b6 08 00 00 00
+  32: 00 00 00 00 00 00 00 00 00 00 00 02 85 00
 ```
 
 ### IPv6 within 802.1Q
@@ -232,6 +247,13 @@ Dest IP:   ff02::1
 EType: 0x0806
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+ARP HType: 1, PType: 2048
+HLen: 6, PLen: 4
+Operation: 0x0001
+Sender HW Addr: ce:32:0b:4c:93:48
+Sender Proto Addr: 172.24.0.1
+Target HW Addr: 00:00:00:00:00:00
+Target Proto Addr: 172.24.0.2
   42:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 00 01 08 00 06 04 00 01 ce 32 0b 4c 93 48 ac 18
   16: 00 01 00 00 00 00 00 00 ac 18 00 02 00 00 00 00
@@ -244,13 +266,20 @@ From:  ce:32:0b:4c:93:48
 EType: 0x0800
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+IP Version 4  DSCP: 0  ECN: 0
+Payload length: 84  Ident: 0x0000
+Flags: 0x02  Frag Off: 0
+TTL:    64     Proto:   1
+CSum: 0xe178
+Source IP: 172.24.0.1
+Dest IP:   172.24.0.255
   98:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 45 00 00 54 00 00 40 00 40 01 e1 78 ac 18 00 01
-  16: ac 18 00 ff 08 00 3f ef d6 a8 00 03 f6 26 85 66
-  32: 00 00 00 00 98 04 0f 00 00 00 00 00 10 11 12 13
+  16: ac 18 00 ff 08 00 47 55 13 80 00 09 ff 46 85 66
+  32: 00 00 00 00 55 a1 04 00 00 00 00 00 10 11 12 13
   48: 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23
   64: 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33
-  80: 34 35 36 37 01 30 01 30 01 30 01 30 01 30 01 30
+  80: 34 35 36 37 34 35 36 37 01 30 01 30 01 30 01 30
   96: 01 30
 ```
 
@@ -285,10 +314,18 @@ Dest IP:   ff02::1
 EType: 0x8100
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+802.1Q VLAN 123: Priority: 2 DEI: N Datagram protocol: 0x0806
+ARP HType: 1, PType: 2048
+HLen: 6, PLen: 4
+Operation: 0x0001
+Sender HW Addr: ce:32:0b:4c:93:48
+Sender Proto Addr: 172.25.0.1
+Target HW Addr: 00:00:00:00:00:00
+Target Proto Addr: 172.25.0.2
   46:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 40 7b 08 06 00 01 08 00 06 04 00 01 ce 32 0b 4c
   16: 93 48 ac 19 00 01 00 00 00 00 00 00 ac 19 00 02
-  32: 00 00 00 00 00 00 00 02 85 00 a5 9f 00 00
+  32: 00 00 00 00 00 00 00 00 00 00 00 02 85 00
 ```
 
 ### 802.1q carrying IPv4
@@ -297,10 +334,18 @@ From:  ce:32:0b:4c:93:48
 EType: 0x8100
 To:    ff:ff:ff:ff:ff:ff
 From:  ce:32:0b:4c:93:48
+802.1Q VLAN 123: Priority: 2 DEI: N Datagram protocol: 0x0800
+IP Version 4  DSCP: 0  ECN: 0
+Payload length: 84  Ident: 0x0000
+Flags: 0x02  Frag Off: 0
+TTL:    64     Proto:   1
+CSum: 0xe176
+Source IP: 172.25.0.1
+Dest IP:   172.25.0.255
  102:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
    0: 40 7b 08 00 45 00 00 54 00 00 40 00 40 01 e1 76
-  16: ac 19 00 01 ac 19 00 ff 08 00 3a 9b d7 15 00 04
-  32: 54 27 85 66 00 00 00 00 45 ea 08 00 00 00 00 00
+  16: ac 19 00 01 ac 19 00 ff 08 00 27 0d 13 57 00 05
+  32: 92 46 85 66 00 00 00 00 df 16 08 00 00 00 00 00
   48: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f
   64: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
   80: 30 31 32 33 34 35 36 37 01 30 01 30 01 30 01 30

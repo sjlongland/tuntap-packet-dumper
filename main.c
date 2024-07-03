@@ -151,7 +151,33 @@ int main(int argc, char* argv[]) {
 				dptr += sizeof(d_proto);
 			}
 
-			if (d_proto == ETH_P_IP) {
+			if (d_proto == ETH_P_ARP) {
+				printf(
+					"ARP HType: %d, PType: %d\n"
+					"HLen: %d, PLen: %d\n"
+					"Operation: 0x%04x\n"
+					"Sender HW Addr: "
+					"%02x:%02x:%02x:%02x:%02x:%02x\n"
+					"Sender Proto Addr: %d.%d.%d.%d\n"
+					"Target HW Addr: "
+					"%02x:%02x:%02x:%02x:%02x:%02x\n"
+					"Target Proto Addr: %d.%d.%d.%d\n",
+					(dptr[0] << 8) | dptr[1],
+					(dptr[2] << 8) | dptr[3],
+					dptr[4], dptr[5],
+					(dptr[6] << 8) | dptr[7],
+					dptr[8], dptr[9],
+					dptr[10], dptr[11],
+					dptr[12], dptr[13],
+					dptr[14], dptr[15],
+					dptr[16], dptr[17],
+					dptr[18], dptr[19],
+					dptr[20], dptr[21],
+					dptr[22], dptr[23],
+					dptr[24], dptr[25],
+					dptr[26], dptr[27]
+				);
+			} else if (d_proto == ETH_P_IP) {
 				struct in_addr raw_addr;
 				uint16_t payload_len;
 				uint16_t header_len;
