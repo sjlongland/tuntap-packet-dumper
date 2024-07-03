@@ -8,9 +8,9 @@ explore how packets can be read and dissected from the tap interface.
 
 The TUN/TAP interface basically spits out raw frames to you.  You have the
 option of having the kernel pre-pend a "packet information" header to this.
-Many examples I've seen "on the net" tell you to set the `IFF_NO_PI` flag when
-opening the device without any explanation as to why you'd want to reject this
-information.  I see that as some sort of knee-jerk reaction.
+It is useful when dealing with traffic that encapsulates IP datagrams, but can
+muddy the waters when other encapsulation protocols (e.g. 802.1Q VLANs) are
+thrown into the mix.
 
 It turns out it's not so difficult to understand, but the standard [TUN/TAP
 docs](http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/networking/tuntap.txt;hb=HEAD)
@@ -105,6 +105,8 @@ From:  ce:32:0b:4c:93:48
 ```
 
 ### 802.1q carrying IPv6 traffic
+
+VLAN is 123 (`0x7b`), priority 2.
 
 ```
 EType: 0x8100
