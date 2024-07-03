@@ -76,7 +76,8 @@ int main(int argc, char* argv[]) {
 			const uint8_t* ptr = &frame.data.data[
 					sizeof(struct ethhdr)
 			];
-			const uint16_t h_proto = htons(ethhdr->h_proto);
+			const uint8_t* dptr = ptr;
+			uint16_t d_proto;
 
 			int off = 0;
 			int len = tun_read(&tun, &frame.data, sizeof(frame));
@@ -86,13 +87,20 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 
+			const uint16_t h_proto = htons(ethhdr->h_proto);
+
 			/* Dump the frame data out to stdout */
-			if (!(tun.flags & IFF_NO_PI)) {
+			if (tun.flags & IFF_NO_PI) {
+				d_proto = h_proto;
+			} else {
+				/* NB: tun_read swaps proto for us */
+				d_proto = frame.data.info.proto;
 				printf("Flags: 0x%04x  Proto: 0x%04x\n",
 					frame.data.info.flags,
-					frame.data.info.proto
+					d_proto
 				);
 			}
+
 			printf("EType: 0x%04x\n"
 			       "To:    %02x:%02x:%02x:%02x:%02x:%02x\n"
 			       "From:  %02x:%02x:%02x:%02x:%02x:%02x\n",
@@ -111,7 +119,39 @@ int main(int argc, char* argv[]) {
 					ethhdr->h_source[5]
 			);
 
-			if (frame.data.info.proto == ETH_P_IPV6) {
+			if (h_proto == ETH_P_8021Q) {
+				/* 802.1Q VLAN tag */
+				uint16_t vlan_tag;
+
+				memcpy(&vlan_tag, dptr, sizeof(vlan_tag));
+				vlan_tag = htons(vlan_tag);
+
+				/* Advance datagram pointer */
+				dptr += sizeof(vlan_tag);
+				if (tun.flags & IFF_NO_PI) {
+					/*
+					 * d_proto will be set to h_proto, but
+					 * the real d_proto is pointed to now
+					 * by dptr, so parse that.
+					 */
+					memcpy(&d_proto, dptr, sizeof(d_proto));
+					d_proto = htons(d_proto);
+				}
+
+				printf(
+					"802.1Q VLAN %d: Priority: %d "
+					"DEI: %c Datagram protocol: 0x%04x\n",
+					vlan_tag & 0x0fff,
+					(vlan_tag & 0xe000) >> 13,
+					((vlan_tag & 0x1000) >> 12) ? 'Y' : 'N',
+					d_proto
+				);
+
+				/* Advance past the datagram protocol header */
+				dptr += sizeof(d_proto);
+			}
+
+			if (d_proto == ETH_P_IPV6) {
 				char addr[INET6_ADDRSTRLEN+1];
 				/*
 				 * We can't use linux/ipv6.h because it
@@ -121,7 +161,7 @@ int main(int argc, char* argv[]) {
 				struct in6_addr raw_addr;
 
 				memcpy(&payload_len,
-						&ptr[4],
+						&dptr[4],
 						sizeof(payload_len));
 				payload_len = htons(payload_len);
 
@@ -130,17 +170,17 @@ int main(int argc, char* argv[]) {
 						"Payload length: %u\n"
 						"Next header: 0x%02x\n"
 						"Hop limit:   %u\n",
-						ptr[0] >> 4,
-						ptr[0] & 0x0f,
-						ptr[1],
-						ptr[2],
-						ptr[3],
+						dptr[0] >> 4,
+						dptr[0] & 0x0f,
+						dptr[1],
+						dptr[2],
+						dptr[3],
 						payload_len,
-						ptr[6],
-						ptr[7]);
+						dptr[6],
+						dptr[7]);
 
 				memset(addr, 0, sizeof(addr));
-				memcpy(&raw_addr, &ptr[8],
+				memcpy(&raw_addr, &dptr[8],
 						sizeof(raw_addr));
 				printf("Source IP: %s\n",
 						inet_ntop(AF_INET6,
@@ -149,7 +189,7 @@ int main(int argc, char* argv[]) {
 							sizeof(addr)));
 
 				memset(addr, 0, sizeof(addr));
-				memcpy(&raw_addr, &ptr[24],
+				memcpy(&raw_addr, &dptr[24],
 						sizeof(raw_addr));
 				printf("Dest IP:   %s\n",
 						inet_ntop(AF_INET6,
@@ -157,6 +197,7 @@ int main(int argc, char* argv[]) {
 							addr,
 							sizeof(addr)));
 			}
+
 			printf("%4d:  0  1  2  3  4  5  6  7"
 				   "  8  9 10 11 12 13 14 15", len);
 			while (len) {
